@@ -1,0 +1,112 @@
+package com.example.sensorapp;
+
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+
+import java.util.List;
+
+public class MySensor implements SensorEventListener {
+    private SensorManager sensorManager;
+    private List<Sensor> sensorList;
+
+    // Constructor
+    public MySensor(Context context) {
+        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
+    }
+
+    // Register sensor listeners for all sensors
+    public void registerSensors() {
+        for (Sensor sensor : sensorList) {
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    // Unregister sensor listeners
+    public void unregisterSensors() {
+        sensorManager.unregisterListener(this);
+    }
+
+    // Sensor event callback
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        // Handle sensor data here
+        int sensorType = event.sensor.getType();
+        float[] values = event.values;
+
+        // Check if sensor type is known
+        if (isKnownSensorType(sensorType)) {
+            StringBuilder sensorData = new StringBuilder(sensorTypeToString(sensorType) + " - ");
+            for (float value : values) {
+                sensorData.append(value).append(", ");
+            }
+            // Remove the trailing comma and space
+            sensorData.setLength(sensorData.length() - 2);
+
+            System.out.println(sensorData.toString());
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Check if sensor type is known
+        if (isKnownSensorType(sensor.getType())) {
+            System.out.println(sensorTypeToString(sensor.getType()) + " Accuracy changed: " + accuracy);
+            // Handle accuracy changes if needed
+        }
+    }
+
+    // Utility method to convert sensor type to string
+    private String sensorTypeToString(int sensorType) {
+        switch (sensorType) {
+            case Sensor.TYPE_ACCELEROMETER:
+                return "Accelerometer";
+            case Sensor.TYPE_GYROSCOPE:
+                return "Gyroscope";
+            case Sensor.TYPE_GRAVITY:
+                return "Gravity";
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                return "Magnetic Field";
+            case Sensor.TYPE_LIGHT:
+                return "Light Sensor";
+            case Sensor.TYPE_PROXIMITY:
+                return "Proximity Sensor";
+            case Sensor.TYPE_PRESSURE:
+                return "Pressure Sensor";
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                return "Linear Acceleration";
+            case Sensor.TYPE_ROTATION_VECTOR:
+                return "Rotation Vector";
+            case Sensor.TYPE_AMBIENT_TEMPERATURE:
+                return "Ambient Temperature";
+            case Sensor.TYPE_RELATIVE_HUMIDITY:
+                return "Relative Humidity";
+            // Add more cases for other sensor types as needed
+            default:
+                return "Unknown Sensor Type " + sensorType;
+        }
+    }
+
+    // Check if sensor type is known
+    private boolean isKnownSensorType(int sensorType) {
+        switch (sensorType) {
+            case Sensor.TYPE_ACCELEROMETER:
+            case Sensor.TYPE_GYROSCOPE:
+            case Sensor.TYPE_GRAVITY:
+            case Sensor.TYPE_MAGNETIC_FIELD:
+            case Sensor.TYPE_LIGHT:
+            case Sensor.TYPE_PROXIMITY:
+            case Sensor.TYPE_PRESSURE:
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+            case Sensor.TYPE_ROTATION_VECTOR:
+            case Sensor.TYPE_AMBIENT_TEMPERATURE:
+            case Sensor.TYPE_RELATIVE_HUMIDITY:
+                return true;
+            default:
+                return false;
+        }
+    }
+}
